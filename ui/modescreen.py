@@ -13,7 +13,7 @@ class ModeScreen(QWidget):
         self.startGameSignal = startGameSignal
         self.mode = "single_player"
         self.difficulty = "hard"
-        self.player = "random"
+        self.player = random.choice(["black", "white"])
 
     def initUI(self):
         self.layout = QVBoxLayout(self)
