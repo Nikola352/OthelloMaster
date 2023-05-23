@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication
 import sys
 from ui.mainwindow import MainWindow
-from game_controller.game_controller import GameController
+from game.game_controller import GameController
 
 def main():
     app = QApplication(sys.argv)

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QLabel, QMessageBox
 from PyQt5.QtGui import QResizeEvent, QPixmap, QFont, QPalette, QIcon
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-from game_controller.constants import BLACK, WHITE, EMPTY
+from game.constants import BLACK, WHITE, EMPTY
 
 class GameplayScreen(QWidget):
 

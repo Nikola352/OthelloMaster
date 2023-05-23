@@ -7,7 +7,7 @@ from ui.modescreen import ModeScreen
 from ui.startscreen import StartScreen
 from ui.howtoplayscreen import HowToPlayScreen
 
-from game_controller.game_controller import GameController
+from game.game_controller import GameController
 
 class MainWindow(QMainWindow):
 

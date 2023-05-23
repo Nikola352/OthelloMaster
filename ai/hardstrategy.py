@@ -1,5 +1,5 @@
 import time, random
-from game_controller.util import get_possible_moves
+from game.util import get_possible_moves
 
 class HardStrategy(object):
     def get_move(self, board: list[list[int]], turn: int) -> tuple[int,int]:

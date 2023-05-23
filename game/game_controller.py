@@ -3,8 +3,8 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from ai.easystrategy import EasyStrategy
 from ai.mediumstrategy import MediumStrategy
 from ai.hardstrategy import HardStrategy
-from game_controller.util import get_possible_moves, calculate_board_position, get_score
-from game_controller.constants import BLACK, WHITE, EMPTY
+from game.util import get_possible_moves, calculate_board_position, get_score
+from game.constants import BLACK, WHITE, EMPTY
 from util.stack import Stack
 
 import threading

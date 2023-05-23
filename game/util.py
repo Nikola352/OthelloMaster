@@ -1,5 +1,5 @@
 from copy import deepcopy
-from game_controller.constants import BLACK, WHITE
+from game.constants import BLACK, WHITE
 
 def check_dir(i, j, deltaRow, deltaCol, board, turn) -> set[tuple[int,int]]:
     moves = set()
