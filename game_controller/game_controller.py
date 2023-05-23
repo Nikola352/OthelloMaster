@@ -1,29 +1,44 @@
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+
+from game_controller.constants import BLACK, WHITE, EMPTY
 
 class GameController(QObject):
 
-    updateBoardSignal = pyqtSignal(list)
+    update_game_state_signal = pyqtSignal(list, int, tuple)
+    update_available_moves_signal = pyqtSignal(list)
+    move_skipped_signal = pyqtSignal()
+    game_over_signal = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
-        self.board = []
+        self._board = [[EMPTY]*8 for _ in range(8)]
+        self._turn = BLACK
+        self._black_score = 0
+        self._white_score = 0
 
-    def setInitialBoard(self):
-        self.board = [] # 8x8 matrix: 0 = empty, 1 = black, -1 = white
-        for i in range(8):
-            self.board.append([])
-            for j in range(8):
-                self.board[i].append(0)
-        self.board[3][3] = -1
-        self.board[3][4] = 1
-        self.board[4][3] = 1
-        self.board[4][4] = -1
+    def _set_initial_board(self):
+        self._board = [[EMPTY]*8 for _ in range(8)]
+        self._board[3][3] = WHITE
+        self._board[3][4] = BLACK
+        self._board[4][3] = BLACK
+        self._board[4][4] = WHITE
 
-    def boardSquareSelected(self, i, j):
-        self.board[i][j] = 1
-        self.updateBoardSignal.emit(self.board)
+    @pyqtSlot(int, int)
+    def board_square_selected(self, i, j):
+        self._board[i][j] = self._turn
+        self._turn = -self._turn
+        self.update_game_state_signal.emit(self._board, self._turn, (self._black_score, self._white_score))
 
-    def startGame(self, mode, player_color, difficulty):
+    @pyqtSlot(str, str, str)
+    def start_game(self, mode, player_color, difficulty):
         print(mode, player_color, difficulty)
-        self.setInitialBoard()
-        self.updateBoardSignal.emit(self.board)
+        self._set_initial_board()
+        self.update_game_state_signal.emit(self._board, self._turn, (self._black_score, self._white_score))
+
+    @pyqtSlot()
+    def undo(self):
+        pass
+
+    @pyqtSlot()
+    def redo(self):
+        pass

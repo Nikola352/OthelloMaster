@@ -7,6 +7,8 @@ from ui.modescreen import ModeScreen
 from ui.startscreen import StartScreen
 from ui.howtoplayscreen import HowToPlayScreen
 
+from game_controller.game_controller import GameController
+
 class MainWindow(QMainWindow):
 
     def __init__(self, game_controller):
@@ -37,12 +39,18 @@ class MainWindow(QMainWindow):
         
         central_widget.setLayout(self.stacked_layout)
 
-    def initController(self, game_controller):
+    def initController(self, game_controller: GameController):
         self.game_controller = game_controller
-        self.game_controller.updateBoardSignal.connect(self.gameplay_screen.updateBoard)
-        # self.game_controller.updateScoreSignal.connect(self.gameplay_screen.updateScore)
-        self.gameplay_screen.boardSquareSelectedSignal.connect(self.game_controller.boardSquareSelected)
-        self.startGameSignal.connect(self.game_controller.startGame)
+        self.game_controller.update_game_state_signal.connect(self.gameplay_screen.updateGameState)
+        self.game_controller.update_available_moves_signal.connect(self.gameplay_screen.updateAvailableMoves)
+        self.game_controller.game_over_signal.connect(self.gameplay_screen.gameOver)
+
+        self.gameplay_screen.board_square_selected_signal.connect(self.game_controller.board_square_selected)
+        self.gameplay_screen.undo_signal.connect(self.game_controller.undo)
+        self.gameplay_screen.redo_signal.connect(self.game_controller.redo)
+        self.gameplay_screen.resign_signal.connect(self.mode_screen.resetSelection)
+
+        self.startGameSignal.connect(self.game_controller.start_game)
 
     def resizeEvent(self, a0: QResizeEvent) -> None:
         self.start_screen.resize(a0.size())

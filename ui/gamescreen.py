@@ -1,18 +1,20 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QLabel
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QLabel, QMessageBox
 from PyQt5.QtGui import QResizeEvent, QPixmap, QFont, QPalette, QIcon
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from game_controller.constants import BLACK, WHITE, EMPTY
 
 class GameplayScreen(QWidget):
 
-    boardSquareSelectedSignal = pyqtSignal(int, int)
-    undoSignal = pyqtSignal()
-    redoSignal = pyqtSignal()
+    board_square_selected_signal = pyqtSignal(int, int)
+    undo_signal = pyqtSignal()
+    redo_signal = pyqtSignal()
+    resign_signal = pyqtSignal()
 
     def __init__(self, stacked_layout):
         super().__init__()
         self.stacked_layout = stacked_layout
         self.initUI()
-        self.board = [[0]*8]*8
+        self.board = [[EMPTY]*8 for _ in range(8)]
 
     def initUI(self):
         self.layout = QVBoxLayout()
@@ -123,9 +125,6 @@ class GameplayScreen(QWidget):
                 piece = QLabel(button)
                 piece.setAlignment(Qt.AlignCenter)
                 piece.setFixedSize(sqare_size, sqare_size)
-                piece.setPixmap(QPixmap("ui/assets/black.png").scaled(sqare_size, sqare_size,
-                                                                      Qt.KeepAspectRatio,
-                                                                      Qt.SmoothTransformation))
                 self.board_layout.addWidget(button, i, j)
                 button_row.append(button)
                 piece_row.append(piece)
@@ -143,7 +142,7 @@ class GameplayScreen(QWidget):
             for j in range(8):
                 self.board_buttons[i][j].setFixedSize(sqare_size, sqare_size)
                 self.pieces[i][j].setFixedSize(sqare_size, sqare_size)
-                pixmap = QPixmap(("ui/assets/black.png" if self.board[i][j] == 1 else "ui/assets/white.png")).scaled(
+                pixmap = QPixmap(("ui/assets/black.png" if self.board[i][j] == BLACK else "ui/assets/white.png")).scaled(
                     self.board_buttons[i][j].size(),
                     Qt.IgnoreAspectRatio,
                     Qt.SmoothTransformation
@@ -153,14 +152,14 @@ class GameplayScreen(QWidget):
     def showStartScreen(self):
         self.stacked_layout.setCurrentIndex(0)
 
-    def boardSquareSelected(self, i, j):
-        self.boardSquareSelectedSignal.emit(i, j)
+    def boardSquareSelected(self, i: int, j: int):
+        self.board_square_selected_signal.emit(i, j)
 
-    def updateBoard(self, board):
+    def updateBoard(self, board: list[list[int]]):
         self.board = board
         for i in range(8):
             for j in range(8):
-                if board[i][j] == 1:
+                if board[i][j] == BLACK:
                     pixmap = QPixmap("ui/assets/black.png").scaled(
                         self.board_buttons[i][j].size(),
                         Qt.IgnoreAspectRatio,
@@ -169,8 +168,7 @@ class GameplayScreen(QWidget):
                     self.pieces[i][j].setPixmap(pixmap)
                     self.pieces[i][j].setVisible(True)
                     self.pieces[i][j].setStyleSheet("background-color: transparent;")
-                    self.board_buttons[i][j].setDisabled(True)
-                elif board[i][j] == -1:
+                elif board[i][j] == WHITE:
                     pixmap = QPixmap("ui/assets/white.png").scaled(
                         self.board_buttons[i][j].size(),
                         Qt.IgnoreAspectRatio,
@@ -179,28 +177,56 @@ class GameplayScreen(QWidget):
                     self.pieces[i][j].setPixmap(pixmap)
                     self.pieces[i][j].setVisible(True)
                     self.pieces[i][j].setStyleSheet("background-color: transparent;")
-                    self.board_buttons[i][j].setDisabled(True)
                 else:  # board[i][j] == 0
                     self.pieces[i][j].setVisible(False)
-                    self.board_buttons[i][j].setDisabled(False)
 
-    def updateTurn(self, turn):
-        if turn == 1:
+    def updateTurn(self, turn: int):
+        if turn == BLACK:
             self.black_count_img.setStyleSheet("border: 1px solid white")
             self.white_count_img.setStyleSheet("border: 0px solid white")
-        else:
+        elif turn == WHITE:
             self.black_count_img.setStyleSheet("border: 0px solid white")
             self.white_count_img.setStyleSheet("border: 1px solid white")
 
-    def updateScore(self, score):
+    def updateScore(self, score: tuple[int,int]):
         self.black_count_label.setText(str(score[0]))
         self.white_count_label.setText(str(score[1]))
 
+    @pyqtSlot(list, int, tuple)
+    def updateGameState(self, board: list[list[int]], turn: int, score: tuple[int,int]):
+        self.updateBoard(board)
+        self.updateTurn(turn)
+        self.updateScore(score)
+
+    @pyqtSlot(list)
+    def updateAvailableMoves(self, moves: list[tuple[int,int]]):
+        for row in self.board_buttons:
+            for button in row:
+                button.setEnabled(False)
+        for move in moves:
+            self.board_buttons[move[0]][move[1]].setEnabled(True)
+
     def undo(self):
-        self.undoSignal.emit()
+        self.undo_signal.emit()
 
     def redo(self):
-        self.redoSignal.emit()
+        self.redo_signal.emit()
 
     def resign(self):
-        print("resign")
+        reply = QMessageBox.question(self, 'Resign', "Are you sure you want to quit?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.stacked_layout.setCurrentIndex(0)
+
+    @pyqtSlot()
+    def moveSkipped(self):
+        QMessageBox.information(self, "Move Skipped", "No moves available. Skipping turn.")
+
+    @pyqtSlot(int)
+    def gameOver(self, winner: int):
+        if winner == BLACK:
+            QMessageBox.information(self, "Game Over", "Black wins!")
+        elif winner == WHITE:
+            QMessageBox.information(self, "Game Over", "White wins!")
+        else:
+            QMessageBox.information(self, "Game Over", "Draw!")
+        self.stacked_layout.setCurrentIndex(0)

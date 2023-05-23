@@ -1,5 +1,5 @@
 import random
-from PyQt5 import QtCore
+from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSpacerItem, QSizePolicy, QButtonGroup
 from PyQt5.QtGui import QIcon, QPixmap, QFont, QPalette, QResizeEvent
 
@@ -7,7 +7,7 @@ class ModeScreen(QWidget):
     def __init__(self, stacked_layout, startGameSignal):
         super().__init__()
         self.stacked_layout = stacked_layout
-        self.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.setLayoutDirection(Qt.LeftToRight)
         self.setStyleSheet("background-color: rgb(11, 94, 112)")
         self.initUI()
         self.startGameSignal = startGameSignal
@@ -36,7 +36,7 @@ class ModeScreen(QWidget):
         font.setKerning(True)
         self.title_label.setFont(font)
         self.title_label.setStyleSheet("color: white")
-        self.title_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.title_label.setAlignment(Qt.AlignCenter)
         self.title_label.setText("Game mode")
         self.layout.addWidget(self.title_label)
 
@@ -48,7 +48,7 @@ class ModeScreen(QWidget):
         font.setWeight(75)
 
         palette = QPalette()
-        palette.setColor(QPalette.ButtonText, QtCore.Qt.white)
+        palette.setColor(QPalette.ButtonText, Qt.white)
 
         spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.layout.addItem(spacer1)
@@ -57,7 +57,7 @@ class ModeScreen(QWidget):
         mode_choice_layout = QHBoxLayout()
         mode_choice_layout.setSpacing(30)
         mode_choice_layout.setContentsMargins(0, 0, 0, 0)
-        mode_choice_layout.setAlignment(QtCore.Qt.AlignCenter)
+        mode_choice_layout.setAlignment(Qt.AlignCenter)
 
         self.difficulty_button_group = QButtonGroup()
         self.difficulty_button_group.setExclusive(True)
@@ -93,7 +93,7 @@ class ModeScreen(QWidget):
         player_choice_layout = QHBoxLayout()
         player_choice_layout.setSpacing(20)
         player_choice_layout.setContentsMargins(0, 0, 0, 0)
-        player_choice_layout.setAlignment(QtCore.Qt.AlignCenter)
+        player_choice_layout.setAlignment(Qt.AlignCenter)
 
         self.player_button_group = QButtonGroup()
 
@@ -141,7 +141,7 @@ class ModeScreen(QWidget):
         difficulty_choice_layout = QHBoxLayout()
         difficulty_choice_layout.setSpacing(20)
         difficulty_choice_layout.setContentsMargins(0, 0, 0, 0)
-        difficulty_choice_layout.setAlignment(QtCore.Qt.AlignCenter)
+        difficulty_choice_layout.setAlignment(Qt.AlignCenter)
 
         self.difficulty_button_group = QButtonGroup()
 
@@ -232,12 +232,19 @@ class ModeScreen(QWidget):
             self.player = random.choice(["black", "white"])
         else:
             self.player = player
-        print(self.player)
 
     def setDifficulty(self, difficulty):
         self.difficulty = difficulty
-        print(self.difficulty)
 
     def showGameplay(self):
         self.stacked_layout.setCurrentIndex(3)
         self.startGameSignal.emit(self.mode, self.player, self.difficulty)
+
+    @pyqtSlot()
+    def resetSelection(self):
+        self.mode = "single_player"
+        self.player = random.choice(["black", "white"])
+        self.difficulty = "hard"
+        self.single_player_button.setChecked(True)
+        self.random_button.setChecked(True)
+        self.hard_button.setChecked(True)
