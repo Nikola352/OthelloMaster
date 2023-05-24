@@ -116,11 +116,18 @@ class GameplayScreen(QWidget):
             for j in range(8):
                 button = QPushButton(self)
                 if i > 1 and i < 6 and j > 1 and j < 6:
-                    button.setStyleSheet("background-color: rgb(0,170,70)")
+                    button.setStyleSheet("""
+                    :enabled {background-color: rgb(0,230,90);}
+                    :disabled {background-color: rgb(0,170,70); opacity: 1;}
+                    """)
                 else:
-                    button.setStyleSheet("background-color: rgb(0,150,60)")
+                    button.setStyleSheet("""
+                    :enabled {background-color: rgb(0,230,90);}
+                    :disabled {background-color: rgb(0,150,60); opacity: 1;}
+                    """)
                 button.setFixedSize(sqare_size, sqare_size)
                 button.clicked.connect(lambda _, i=i, j=j: self.boardSquareSelected(i, j))
+                button.setEnabled(False)
 
                 piece = QLabel(button)
                 piece.setAlignment(Qt.AlignCenter)
