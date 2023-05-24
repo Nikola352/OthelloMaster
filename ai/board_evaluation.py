@@ -2,24 +2,44 @@ from game.constants import BLACK, WHITE, EMPTY
 from game.util import get_score, get_possible_moves, calculate_board_position
 from collections import deque
 
-WEIGHTS = [
-    [30, -3, 11, 8, 8, 11, -3, 30],
-    [-3, -7, -4, 1, 1, -4, -7, -3],
-    [11, -4, 2, 2, 2, 2, -4, 11],
-    [8, 1, 2, -3, -3, 2, 1, 8],
-    [8, 1, 2, -3, -3, 2, 1, 8],
-    [11, -4, 2, 2, 2, 2, -4, 11],
-    [-3, -7, -4, 1, 1, -4, -7, -3],
-    [30, -3, 11, 8, 8, 11, -3, 30]
-]
-
 # Scaled sum of pieces on the board, based on their position.
-def weighted_piece_sum(board: list[list[int]]) -> int:
-    res = 0
-    for row, val_row in zip(board, WEIGHTS):
+def weight_sum_diff(board: list[list[int]]) -> int:
+    weights = [
+        [200 , -100, 100,  50,  50, 100, -100,  200],
+        [-100, -200, -50, -50, -50, -50, -200, -100],
+        [100 ,  -50, 100,   0,   0, 100,  -50,  100],
+        [50  ,  -50,   0,   0,   0,   0,  -50,   50],
+        [50  ,  -50,   0,   0,   0,   0,  -50,   50],
+        [100 ,  -50, 100,   0,   0, 100,  -50,  100],
+        [-100, -200, -50, -50, -50, -50, -200, -100],
+        [200 , -100, 100,  50,  50, 100, -100,  200]
+    ]
+    if board[0][0] != EMPTY:
+        weights[0][1] = 0
+        weights[1][0] = 0
+        weights[1][1] = 0
+    if board[0][7] != EMPTY:
+        weights[0][6] = 0
+        weights[1][6] = 0
+        weights[1][7] = 0
+    if board[7][0] != EMPTY:
+        weights[6][0] = 0
+        weights[6][1] = 0
+        weights[7][1] = 0
+    if board[7][7] != EMPTY:
+        weights[6][6] = 0
+        weights[6][7] = 0
+        weights[7][6] = 0
+    black_val, white_val = 0, 0
+    for row, val_row in zip(board, weights):
         for piece, value in zip(row, val_row):
-            res += piece * value
-    return res
+            if piece == BLACK:
+                black_val += value
+            elif piece == WHITE:
+                white_val += value
+    if black_val + white_val == 0:
+        return 0
+    return (black_val - white_val) / (black_val + white_val)
 
 
 # Relative difference of number of pieces
@@ -223,5 +243,5 @@ def evaluate_board(board: list[list[int]]) -> float:
             return float("-inf")
     stability = stability_diff(board)
     corners = corner_diff(board)
-    weighted_sum = weighted_piece_sum(board)
-    return 200*num_pieces + 30*mobility + 300*stability + 10000*corners + weighted_sum
+    weighted_sum = weight_sum_diff(board)
+    return 200*num_pieces + 30*mobility + 300*stability + 10000*corners + 400*weighted_sum
