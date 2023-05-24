@@ -12,8 +12,8 @@ class HardStrategy(object):
         }
         self._cached_val = BoardMap()
         self._cahched_moves = {
-            BLACK: BoardMap(),
-            WHITE: BoardMap()
+            BLACK: BoardMap(unique=True),
+            WHITE: BoardMap(unique=True)
         }
 
     def get_possible_moves(self, board: list[list[int]], turn: int) -> list[tuple[int,int]]:
