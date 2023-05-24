@@ -1,4 +1,4 @@
-import time, random
+import time
 from game.constants import BLACK, WHITE
 from game.util import get_possible_moves, calculate_board_position, get_score
 from ai.board_evaluation import evaluate_board
@@ -107,7 +107,7 @@ class HardStrategy(object):
                 alpha = max(alpha, val)
                 if beta <= alpha:
                     break
-            self._cached_position[player][tuple(map(tuple, board))] = maxVal
+            self._cached_position[player][board] = maxVal
             return maxVal
         else: # WHITE: min player
             minVal = float('inf')
@@ -119,5 +119,5 @@ class HardStrategy(object):
                 beta = min(beta, val)
                 if beta <= alpha:
                     break
-            self._cached_position[player][tuple(map(tuple, board))] = minVal
+            self._cached_position[player][board] = minVal
             return minVal
