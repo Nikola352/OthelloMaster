@@ -49,11 +49,11 @@ class GameController(QObject):
             self._get_white_move = self._user_move
         elif mode == "single_player":
             if difficulty == "easy":
-                self.cpu_strategy = EasyStrategy()
+                self._cpu_strategy = EasyStrategy()
             elif difficulty == "medium":
-                self.cpu_strategy = MediumStrategy()
+                self._cpu_strategy = MediumStrategy()
             elif difficulty == "hard":
-                self.cpu_strategy = HardStrategy()
+                self._cpu_strategy = HardStrategy()
 
             if player_color == "black":
                 self._get_black_move = self._user_move
@@ -89,7 +89,7 @@ class GameController(QObject):
 
     def _computer_move(self):
         def calculate_move():
-            move = self.cpu_strategy.get_move(self._board, self._turn)
+            move = self._cpu_strategy.get_move(self._board, self._turn)
             self._play(move)
         self.thread = threading.Thread(target=calculate_move)
         self.thread.start()
