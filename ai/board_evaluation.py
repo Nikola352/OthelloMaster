@@ -228,20 +228,34 @@ def corner_diff(board: list[list[int]]) -> float:
     return 3 * corners - adjacent
 
 
+def get_num_pieces(board: list[list[int]]) -> int:
+    num_pieces = 0
+    for row in board:
+        for piece in row:
+            if piece != EMPTY:
+                num_pieces += 1
+    return num_pieces
+
+
 def evaluate_board(board: list[list[int]]) -> float:
     """
     Calculates static evaluation of the board.
     Higher values are better for black, and lower values are better for white.
     """
-    num_pieces = num_pieces_diff(board)
+    num_pieces_val = num_pieces_diff(board)
     try:
         mobility = mobility_diff(board)
     except ValueError:
-        if num_pieces > 0:
-            return float("inf")
-        else:
-            return float("-inf")
+        return 10000 * num_pieces_val
+    
     stability = stability_diff(board)
     corners = corner_diff(board)
     weighted_sum = weight_sum_diff(board)
-    return 200*num_pieces + 30*mobility + 300*stability + 10000*corners + 400*weighted_sum
+    
+    num_pieces = get_num_pieces(board)
+    if num_pieces < 20:
+        return 10000 * corners + 400 * stability + 300 * weighted_sum + 50 * mobility
+    elif num_pieces <= 54:
+        return 10000 * corners + 400 * stability + 300 * weighted_sum + 20 * mobility + 100 * num_pieces_val
+    else:
+        return 10000 * corners + 400 * stability + 300 * weighted_sum + 100 * mobility + 500 * num_pieces_val
