@@ -19,24 +19,9 @@ class HardStrategy(object):
     def get_possible_moves(self, board: list[list[int]], turn: int) -> list[tuple[int,int]]:
         if board in self._cahched_moves[turn]:
             return self._cahched_moves[turn][board]
-        
         moves = get_possible_moves(board, turn)
-        
-        # if 'good moves' are available, ignore the rest
-        # good moves are corners or forcing opponent to skip turn
-        good_moves = []
-        for move in moves:
-            if move in [(0,0), (0,7), (7,0), (7,7)]:
-                good_moves.append(move)
-            elif len(get_possible_moves(calculate_board_position(board, turn, move), -turn)) == 0:
-                good_moves.append(move)
-
-        if len(good_moves) > 0:
-            moves = good_moves
-        
         self._cahched_moves[turn][board] = moves
         return moves
-
 
     def get_move(self, board: list[list[int]], turn: int) -> tuple[int,int]:
         moves = self.get_possible_moves(board, turn)
@@ -45,7 +30,7 @@ class HardStrategy(object):
         
         max_depth = 6
         self.start_time = time.time()
-        best_move = moves[0]
+        best_move = None
 
         for depth in range(2, max_depth+1):
             if time.time() - self.start_time > 2.5:
