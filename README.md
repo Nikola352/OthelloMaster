@@ -20,3 +20,8 @@ Simply run the main.py file with Python 3.6+.
 python3 main.py
 ```
 
+## Screenshots
+![start screen](https://raw.githubusercontent.com/Nikola352/OthelloMaster/assets/ss1.png)
+![game mode](https://raw.githubusercontent.com/Nikola352/OthelloMaster/assets/ss2.png)
+![game start](https://raw.githubusercontent.com/Nikola352/OthelloMaster/assets/ss3.png)
+![gameplay](https://raw.githubusercontent.com/Nikola352/OthelloMaster/assets/ss4.png)
