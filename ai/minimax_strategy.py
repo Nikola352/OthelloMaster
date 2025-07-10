@@ -33,7 +33,7 @@ class MinimaxStrategy(object):
         best_move = None
 
         for depth in range(2, max_depth+1):
-            if time.time() - self.start_time > 2.5:
+            if time.time() - self.start_time > 2.9:
                 print(depth-1, time.time() - self.start_time)
                 break
         
@@ -43,7 +43,7 @@ class MinimaxStrategy(object):
             if turn == BLACK:
                 maxVal = float('-inf')
                 for i, move in enumerate(moves[:]):
-                    val = self.minimax(calculate_board_position(board, turn, move), turn, depth, float('-inf'), float('inf'))
+                    val = self.minimax(calculate_board_position(board, turn, move), -turn, depth, float('-inf'), float('inf'))
                     if val >= maxVal:
                         maxVal = val
                         best_move = move
@@ -51,12 +51,11 @@ class MinimaxStrategy(object):
             else: # WHITE
                 minVal = float('inf')
                 for i, move in enumerate(moves[:]):
-                    val = self.minimax(calculate_board_position(board, turn, move), turn, depth, float('-inf'), float('inf'))
+                    val = self.minimax(calculate_board_position(board, turn, move), -turn, depth, float('-inf'), float('inf'))
                     if val <= minVal:
                         minVal = val
                         best_move = move
                         moves[i], moves[0] = moves[0], moves[i]
-            self._cahched_moves[turn][board] = moves
         return best_move
     
     def minimax(self, board: list[list[int]], player: int, depth: int, alpha: float, beta: float) -> float:
