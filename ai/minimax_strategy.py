@@ -4,7 +4,7 @@ from game.util import get_possible_moves, calculate_board_position, get_score
 from ai.board_evaluation import evaluate_board
 from util.boardmap import BoardMap
 
-class HardStrategy(object):
+class MinimaxStrategy(object):
     def __init__(self):
         self._cached_position = {
             BLACK: BoardMap(),

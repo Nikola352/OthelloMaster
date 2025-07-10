@@ -1,8 +1,8 @@
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
-from ai.easystrategy import EasyStrategy
-from ai.mediumstrategy import MediumStrategy
-from ai.hardstrategy import HardStrategy
+from ai.random_strategy import RandomStrategy
+from ai.greedy_strategy import GreedyStrategy
+from ai.minimax_strategy import MinimaxStrategy
 from game.util import get_possible_moves, calculate_board_position, get_score
 from game.constants import BLACK, WHITE, EMPTY
 from util.stack import Stack
@@ -49,11 +49,11 @@ class GameController(QObject):
             self._get_white_move = self._user_move
         elif mode == "single_player":
             if difficulty == "easy":
-                self._cpu_strategy = EasyStrategy()
+                self._cpu_strategy = RandomStrategy()
             elif difficulty == "medium":
-                self._cpu_strategy = MediumStrategy()
+                self._cpu_strategy = GreedyStrategy()
             elif difficulty == "hard":
-                self._cpu_strategy = HardStrategy()
+                self._cpu_strategy = MinimaxStrategy()
 
             if player_color == "black":
                 self._get_black_move = self._user_move
