@@ -1,7 +1,8 @@
+from ai.strategy import Strategy
 from game.util import get_possible_moves, calculate_board_position
 from ai.board_evaluation import num_pieces_diff
 
-class GreedyStrategy(object):
+class GreedyStrategy(Strategy):
     def get_move(self, board: list[list[int]], turn: int) -> tuple[int,int]:
         moves = get_possible_moves(board, turn)
         best_move = moves[0]

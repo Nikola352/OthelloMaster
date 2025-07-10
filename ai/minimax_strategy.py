@@ -1,27 +1,18 @@
 import time
+from ai.tree_search_strategy import TreeSearchStrategy
 from game.constants import BLACK, WHITE
-from game.util import get_possible_moves, calculate_board_position, get_score
+from game.util import calculate_board_position, get_score
 from ai.board_evaluation import evaluate_board
 from util.boardmap import BoardMap
 
-class MinimaxStrategy(object):
+class MinimaxStrategy(TreeSearchStrategy):
     def __init__(self):
+        super().__init__()
         self._cached_position = {
             BLACK: BoardMap(),
             WHITE: BoardMap()
         }
         self._cached_val = BoardMap()
-        self._cahched_moves = {
-            BLACK: BoardMap(unique=True),
-            WHITE: BoardMap(unique=True)
-        }
-
-    def get_possible_moves(self, board: list[list[int]], turn: int) -> list[tuple[int,int]]:
-        if board in self._cahched_moves[turn]:
-            return self._cahched_moves[turn][board]
-        moves = get_possible_moves(board, turn)
-        self._cahched_moves[turn][board] = moves
-        return moves
 
     def get_move(self, board: list[list[int]], turn: int) -> tuple[int,int]:
         moves = self.get_possible_moves(board, turn)
