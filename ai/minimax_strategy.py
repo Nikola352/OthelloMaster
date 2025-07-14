@@ -1,6 +1,6 @@
 import time
 from ai.tree_search_strategy import TreeSearchStrategy
-from game.constants import BLACK, WHITE
+from game.constants import BLACK, TIME_LIMIT, WHITE
 from game.util import calculate_board_position, get_score
 from ai.board_evaluation import evaluate_board
 from util.boardmap import BoardMap
@@ -24,7 +24,7 @@ class MinimaxStrategy(TreeSearchStrategy):
         best_move = None
 
         for depth in range(2, max_depth+1):
-            if time.time() - self.start_time > 2.9:
+            if time.time() - self.start_time > TIME_LIMIT - 0.1:
                 print(depth-1, time.time() - self.start_time)
                 break
         
@@ -53,7 +53,7 @@ class MinimaxStrategy(TreeSearchStrategy):
         if board in self._cached_position[player]:
             return self._cached_position[player][board]
 
-        if depth == 0 or time.time() - self.start_time > 2.95:
+        if depth == 0 or time.time() - self.start_time > TIME_LIMIT - 0.05:
             if board in self._cached_val:
                 return self._cached_val[board]
             val = evaluate_board(board)
