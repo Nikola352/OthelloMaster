@@ -1,16 +1,18 @@
+from concurrent.futures import Future, ProcessPoolExecutor
+import copy
 from math import sqrt, log
 import random
 import time
 from ai.random_strategy import RandomStrategy
 from ai.strategy import Strategy
 from ai.tree_search_strategy import TreeSearchStrategy
-from game.board import Board
 from game.constants import BLACK, TIME_LIMIT
 from game.util import calculate_board_position, get_score
 
 
 C = sqrt(2)
 GAMMA = 0.95
+NUM_WORKERS = 8
 
 
 class Node(object):
@@ -42,12 +44,12 @@ class Node(object):
 
 
 class MonteCarloTreeSearchStrategy(TreeSearchStrategy):
-    def __init__(self, gamma = None):
+    def __init__(self, gamma = GAMMA, num_workers = NUM_WORKERS):
         super().__init__()
-        self._rollout_policy: Strategy = RandomStrategy()
-        self._gamma = gamma if gamma else GAMMA
+        self._gamma = gamma
+        self._num_workers = num_workers
 
-    def get_move(self, board: Board, turn: int) -> tuple[int,int]:
+    def get_move(self, board: list[list[int]], turn: int) -> tuple[int,int]:
         self._turn = turn
         self._board = board
         self._root = Node()
@@ -55,14 +57,27 @@ class MonteCarloTreeSearchStrategy(TreeSearchStrategy):
 
         start_time = time.time()
 
-        while time.time() - start_time < TIME_LIMIT - 0.1:
-            node, board, turn = self.select_and_expand()
-            reward = self.rollout(board, turn)
-            self.backpropagate(node, reward)
+        with ProcessPoolExecutor(max_workers=self._num_workers) as executor:
+            futures: list[tuple[Future[float], Node]] = []
+
+            while time.time() - start_time < TIME_LIMIT - 0.5:
+                node, board, turn = self.select_and_expand()
+
+                # start a rollout in parallel
+                future = executor.submit(self._parallel_rollout, board, turn)
+                futures.append((future, node))
+
+                # throttle the number of pending rollouts
+                if len(futures) > self._num_workers * 2:
+                    self._consume_futures(futures)
+
+            self._consume_futures(futures)
+
+        print(time.time() - start_time)
 
         return max(self._root.children, key=lambda n: n.value).action
 
-    def select_and_expand(self) -> tuple[Node, Board, int]:
+    def select_and_expand(self) -> tuple[Node, list[list[int]], int]:
         node = self._root
         board = self._board
         turn = self._turn
@@ -92,7 +107,7 @@ class MonteCarloTreeSearchStrategy(TreeSearchStrategy):
 
         return node.children[0], calculate_board_position(board, turn, moves[0]), -turn
 
-    def rollout(self, board: Board, turn: int) -> float:
+    def rollout(self, board: list[list[int]], turn: int) -> float:
         while moves := self.get_possible_moves(board, turn) or self.get_possible_moves(board, -turn):
             if not moves:
                 turn = -turn
@@ -110,7 +125,16 @@ class MonteCarloTreeSearchStrategy(TreeSearchStrategy):
             reward = -self._gamma * reward # reward for player is opposite of reward for opponent
         node.visit_count += 1
 
-    def _get_state_value(self, board: Board, turn: int):
+    def _parallel_rollout(self, board: list[list[int]], turn: int) -> float:
+        return self.rollout(copy.deepcopy(board), turn)
+
+    def _consume_futures(self, futures: list[tuple[Future[float], Node]]):
+        for future, node in futures:
+            reward = future.result()
+            self.backpropagate(node, reward)
+        futures.clear()
+
+    def _get_state_value(self, board: list[list[int]], turn: int):
         black, white = get_score(board)
         if black == white:
             return 0
