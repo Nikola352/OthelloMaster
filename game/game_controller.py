@@ -1,5 +1,6 @@
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
+from ai.mcts_strategy import MonteCarloTreeSearchStrategy
 from ai.random_strategy import RandomStrategy
 from ai.greedy_strategy import GreedyStrategy
 from ai.minimax_strategy import MinimaxStrategy
@@ -35,7 +36,7 @@ class GameController(QObject):
         self._board[4][4] = WHITE
 
     @pyqtSlot(str, str, str)
-    def start_game(self, mode, player_color, difficulty):
+    def start_game(self, mode, player_color, ai_strategy):
         self._mode = mode
         self._set_initial_board()
         self._turn = BLACK
@@ -48,12 +49,14 @@ class GameController(QObject):
             self._get_black_move = self._user_move
             self._get_white_move = self._user_move
         elif mode == "single_player":
-            if difficulty == "easy":
+            if ai_strategy == "random":
                 self._cpu_strategy = RandomStrategy()
-            elif difficulty == "medium":
+            elif ai_strategy == "greedy":
                 self._cpu_strategy = GreedyStrategy()
-            elif difficulty == "hard":
+            elif ai_strategy == "minimax":
                 self._cpu_strategy = MinimaxStrategy()
+            elif ai_strategy == "mcts":
+                self._cpu_strategy = MonteCarloTreeSearchStrategy()
 
             if player_color == "black":
                 self._get_black_move = self._user_move

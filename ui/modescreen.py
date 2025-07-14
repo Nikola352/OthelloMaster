@@ -12,7 +12,7 @@ class ModeScreen(QWidget):
         self.initUI()
         self.startGameSignal = startGameSignal
         self.mode = "single_player"
-        self.difficulty = "hard"
+        self.ai_strategy = "hard"
         self.player = random.choice(["black", "white"])
 
     def initUI(self):
@@ -59,8 +59,8 @@ class ModeScreen(QWidget):
         mode_choice_layout.setContentsMargins(0, 0, 0, 0)
         mode_choice_layout.setAlignment(Qt.AlignCenter)
 
-        self.difficulty_button_group = QButtonGroup()
-        self.difficulty_button_group.setExclusive(True)
+        self.ai_strategy_button_group = QButtonGroup()
+        self.ai_strategy_button_group.setExclusive(True)
 
         # Single player Button
         pixmap = QPixmap("ui/assets/user_vs_robot.png").scaledToHeight(70)
@@ -72,7 +72,7 @@ class ModeScreen(QWidget):
         self.single_player_button.setStyleSheet("QPushButton:checked { border: 2px solid rgb(0, 50, 100); }")
         self.single_player_button.setMinimumSize(70, 70)
         self.single_player_button.setIconSize(self.single_player_button.size())
-        self.difficulty_button_group.addButton(self.single_player_button)
+        self.ai_strategy_button_group.addButton(self.single_player_button)
         mode_choice_layout.addWidget(self.single_player_button)
 
         self.layout.addLayout(mode_choice_layout)
@@ -86,7 +86,7 @@ class ModeScreen(QWidget):
         self.two_player_button.setStyleSheet("QPushButton:checked { border: 2px solid rgb(0, 50, 100); }")
         self.two_player_button.setMinimumSize(70, 70)
         self.two_player_button.setIconSize(self.two_player_button.size())
-        self.difficulty_button_group.addButton(self.two_player_button)
+        self.ai_strategy_button_group.addButton(self.two_player_button)
         mode_choice_layout.addWidget(self.two_player_button)
 
         # Player choice
@@ -137,49 +137,61 @@ class ModeScreen(QWidget):
 
         self.layout.addLayout(player_choice_layout)
 
-        # Difficulty choice
-        difficulty_choice_layout = QHBoxLayout()
-        difficulty_choice_layout.setSpacing(20)
-        difficulty_choice_layout.setContentsMargins(0, 0, 0, 0)
-        difficulty_choice_layout.setAlignment(Qt.AlignCenter)
+        # AI strategy choice
+        ai_strategy_choice_layout = QHBoxLayout()
+        ai_strategy_choice_layout.setSpacing(20)
+        ai_strategy_choice_layout.setContentsMargins(0, 0, 0, 0)
+        ai_strategy_choice_layout.setAlignment(Qt.AlignCenter)
 
-        self.difficulty_button_group = QButtonGroup()
+        self.ai_strategy_button_group = QButtonGroup()
 
-        # Easy Button
+        # Random Button
         self.easy_button = QPushButton(self)
         self.easy_button.setFont(font)
         self.easy_button.setPalette(palette)
         self.easy_button.setText("Random")
-        self.easy_button.clicked.connect(lambda: self.setDifficulty("easy"))
+        self.easy_button.clicked.connect(lambda: self.setAiStrategy("random"))
         self.easy_button.setCheckable(True)
         self.easy_button.setStyleSheet("QPushButton:checked { border: 2px solid rgb(0, 50, 100); }")
-        self.difficulty_button_group.addButton(self.easy_button)
-        difficulty_choice_layout.addWidget(self.easy_button)
+        self.ai_strategy_button_group.addButton(self.easy_button)
+        ai_strategy_choice_layout.addWidget(self.easy_button)
 
-        # Medium Button
+        # Greedy Button
         self.medium_button = QPushButton(self)
         self.medium_button.setFont(font)
         self.medium_button.setPalette(palette)
         self.medium_button.setText("Greedy")
-        self.medium_button.clicked.connect(lambda: self.setDifficulty("medium"))
+        self.medium_button.clicked.connect(lambda: self.setAiStrategy("greedy"))
         self.medium_button.setCheckable(True)
         self.medium_button.setStyleSheet("QPushButton:checked { border: 2px solid rgb(0, 50, 100); }")
-        self.difficulty_button_group.addButton(self.medium_button)
-        difficulty_choice_layout.addWidget(self.medium_button)
+        self.ai_strategy_button_group.addButton(self.medium_button)
+        ai_strategy_choice_layout.addWidget(self.medium_button)
 
-        # Hard Button
+        # Minimax Button
         self.hard_button = QPushButton(self)
         self.hard_button.setFont(font)
         self.hard_button.setPalette(palette)
         self.hard_button.setText("Minimax")
-        self.hard_button.clicked.connect(lambda: self.setDifficulty("hard"))
+        self.hard_button.clicked.connect(lambda: self.setAiStrategy("minimax"))
         self.hard_button.setCheckable(True)
         self.hard_button.setChecked(True)
         self.hard_button.setStyleSheet("QPushButton:checked { border: 2px solid rgb(0, 50, 100); }")
-        self.difficulty_button_group.addButton(self.hard_button)
-        difficulty_choice_layout.addWidget(self.hard_button)
+        self.ai_strategy_button_group.addButton(self.hard_button)
+        ai_strategy_choice_layout.addWidget(self.hard_button)
 
-        self.layout.addLayout(difficulty_choice_layout)
+        # MCTS Button
+        self.mcts_button = QPushButton(self)
+        self.mcts_button.setFont(font)
+        self.mcts_button.setPalette(palette)
+        self.mcts_button.setText("MCTS")
+        self.mcts_button.clicked.connect(lambda: self.setAiStrategy("mcts"))
+        self.mcts_button.setCheckable(True)
+        self.mcts_button.setChecked(True)
+        self.mcts_button.setStyleSheet("QPushButton:checked { border: 2px solid rgb(0, 50, 100); }")
+        self.ai_strategy_button_group.addButton(self.mcts_button)
+        ai_strategy_choice_layout.addWidget(self.mcts_button)
+
+        self.layout.addLayout(ai_strategy_choice_layout)
 
         # Play Button
         self.play_button = QPushButton(self)
@@ -218,6 +230,7 @@ class ModeScreen(QWidget):
             self.easy_button.setEnabled(True)
             self.medium_button.setEnabled(True)
             self.hard_button.setEnabled(True)
+            self.mcts_button.setEnabled(True)
         else:
             self.black_button.setEnabled(False)
             self.random_button.setEnabled(False)
@@ -225,6 +238,7 @@ class ModeScreen(QWidget):
             self.easy_button.setEnabled(False)
             self.medium_button.setEnabled(False)
             self.hard_button.setEnabled(False)
+            self.mcts_button.setEnabled(False)
         print(self.mode)
 
     def setPlayer(self, player):
@@ -233,18 +247,18 @@ class ModeScreen(QWidget):
         else:
             self.player = player
 
-    def setDifficulty(self, difficulty):
-        self.difficulty = difficulty
+    def setAiStrategy(self, ai_strategy):
+        self.ai_strategy = ai_strategy
 
     def showGameplay(self):
         self.stacked_layout.setCurrentIndex(3)
-        self.startGameSignal.emit(self.mode, self.player, self.difficulty)
+        self.startGameSignal.emit(self.mode, self.player, self.ai_strategy)
 
     @pyqtSlot()
     def resetSelection(self):
         self.mode = "single_player"
         self.player = random.choice(["black", "white"])
-        self.difficulty = "hard"
+        self.ai_strategy = "hard"
         self.single_player_button.setChecked(True)
         self.random_button.setChecked(True)
         self.hard_button.setChecked(True)
