@@ -2,12 +2,11 @@
 
 Othello game built with Python and PyQT5.
 Supports 2 players and 1 player vs AI mode.
-Minimax algorithm with custom heuristics is used for AI.
 
 ## Requirements
 <ul>
     <li>Python 3.6+</li>
-    <li> PyQT5</li>
+    <li>PyQT5</li>
 </ul>
 
 ```
@@ -19,6 +18,21 @@ Simply run the main.py file with Python 3.6+.
 ```
 python3 main.py
 ```
+
+## AI
+Multiple AI strategies implemented.
+
+### Random
+Takes completely random moves. Useful for testing and as a reference player.
+
+### Greedy
+Always makes a move that captures the most pieces. A player stronger than random to validate stronger models.
+
+### Minimax
+Minimax algorithm with alpha-beta pruning and a custom heuristic.
+
+### MCTS
+Monte Carlo Tree Search with random rollouts.
 
 ## Screenshots
 ![start screen](https://raw.githubusercontent.com/Nikola352/OthelloMaster/assets/ss1.png)
